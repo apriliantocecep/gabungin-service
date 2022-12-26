@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package account;
+
+option go_package = "github.com/apriliantocecep/api-gateway-gabungin/pkg/account/pb";
+
+service AccountService {
+    rpc Create (CreateRequest) returns (CreateResponse);
+    rpc Read (ReadRequest) returns (ReadResponse);
+    rpc Update (UpdateRequest) returns (UpdateResponse);
+    rpc Delete (DeleteRequest) returns (DeleteResponse);
+    rpc Browse (BrowseRequest) returns (BrowseResponse);
+}
+
+message User {
+    int64 id = 1;
+    string email = 2;
+    string password = 3;
+    string first_name = 4;
+    string last_name = 5;
+    string gender = 6;
+    int32 status = 7;
+    string username = 8;
+}
+
+message CreateRequest {
+    User data = 1;
+}
+
+message CreateResponse {
+    int64 status = 1;
+    string error = 2;
+    User data = 3;
+}
+
+message ReadRequest {
+    int64 id = 1;
+}
+
+message ReadResponse {
+    int64 status = 1;
+    string error = 2;
+    User data = 3;
+}
+
+message UpdateRequest {
+    int64 id = 1;
+    User data = 2;
+}
+
+message UpdateResponse {
+    int64 status = 1;
+    string error = 2;
+    User data = 3;
+}
+
+message DeleteRequest {
+    int64 id = 1;
+}
+
+message DeleteResponse {
+    int64 status = 1;
+    string error = 2;
+    User data = 3;
+}
+
+message BrowseRequest {
+    int32 page = 1;
+    int32 pageSize = 2;
+}
+
+message BrowseResponse {
+    int64 status = 1;
+    string error = 2;
+    repeated User data = 3;
+    int32 page = 4;
+    int32 pageSize = 5;
+}

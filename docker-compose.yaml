@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: gabungin-psql
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=gabungin
+      # - DATABASE_HOST=${DB_HOST}
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_postgres:/var/lib/postgresql/data
+    networks:
+      - gabungin
+  
+  pgadmin:
+    container_name: gabungin-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postgres
+    ports:
+      - "5050:80"
+    networks:
+      - gabungin
+    restart: unless-stopped
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+
+  api-gateway:
+    container_name: api-gateway-gabungin
+    build:
+      context: ./api-gateway-gabungin
+      dockerfile: Dockerfile
+    ports:
+      - 50001:50001
+    image: "cecepaprilianto/api-gateway-gabungin:1.0.0"
+    restart: on-failure
+    networks:
+      - gabungin
+    depends_on:
+      - auth-service
+
+  auth-service:
+    container_name: auth-service-gabungin
+    build:
+      context: ./auth-service-gabungin
+      dockerfile: Dockerfile
+    ports:
+      - 50002:50002
+    image: "cecepaprilianto/auth-service-gabungin:1.0.0"
+    restart: on-failure
+    depends_on:
+      - postgres
+    networks:
+      - gabungin
+  
+  family-service:
+    container_name: family-service-gabungin
+    build:
+      context: ./family-service-gabungin
+      dockerfile: Dockerfile
+    ports:
+      - 50003:50003
+    image: "cecepaprilianto/family-service-gabungin:1.0.0"
+    restart: on-failure
+    depends_on:
+      - postgres
+    networks:
+      - gabungin
+  
+  account-service:
+    container_name: account-service-gabungin
+    build:
+      context: ./account-service-gabungin
+      dockerfile: Dockerfile
+    ports:
+      - 50004:50004
+    image: "cecepaprilianto/account-service-gabungin:1.0.0"
+    restart: on-failure
+    depends_on:
+      - postgres
+    networks:
+      - gabungin
+
+  # frontend:
+  #   container_name: frontend-gabungin
+  #   build:
+  #     context: ./frontend-gabungin
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - 3000:3000
+  #   image: "cecepaprilianto/frontend-gabungin:1.0.0"
+  #   restart: on-failure
+  #   networks:
+  #     - gabungin
+  #   depends_on:
+  #     - api-gateway
+
+volumes:
+  db_postgres:
+  pgadmin:
+
+networks:
+  gabungin:
+    driver: bridge
